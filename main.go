@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/IvanYaremko/square-scrimmage/templates"
 	"github.com/joho/godotenv"
 )
 
@@ -23,5 +24,6 @@ func main() {
 }
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
-
+	component := templates.Home()
+	component.Render(r.Context(), w)
 }
