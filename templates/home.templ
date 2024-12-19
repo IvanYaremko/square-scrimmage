@@ -3,7 +3,20 @@ package templates
 templ Home() {
  	@base() {
 		<div>
-			<h1>Hello World!</h1>
+			<h1>Square Scrimmage</h1>
+		</div>
+		<div x-data="gridApp">
+			<canvas
+				id="gridCanvas"
+				width=500
+				height=500
+				x-ref="canvas"
+				@click="handleClick"
+			>
+			</canvas
+		</div>
+		<div>
+			Selected cell: <span x-text='selectedCell'></span>
 		</div>
 	}
 }
