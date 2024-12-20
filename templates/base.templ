@@ -7,12 +7,12 @@ templ base() {
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-			<title>SquareScrimmage</title>
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 			<style>
 				canvas { border: 1px solid #000; user-select: none; }
 			</style>
-        </style>
+			@gridScript()
+    
 		</head>
 		<body>
 			<div class="container">
@@ -20,4 +20,77 @@ templ base() {
 			</div>
 		</body>
 	</html>
+}
+
+templ gridScript() {
+	<script>
+	document.addEventListener('alpine:init', () => {
+	 Alpine.data('gridApp', () => ({
+        gridState: Array(100).fill().map(() => Array(100).fill(0)),
+        selectedCell: 'None',
+        CELL_SIZE: 5,
+        GRID_SIZE: 100,
+        
+        init() {
+            this.$nextTick(() => {
+                this.ctx = this.$refs.canvas.getContext('2d');
+                this.drawGrid();
+            });
+        },
+
+        drawGrid() {
+            const canvas = this.$refs.canvas;
+            this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw filled cells
+            for (let row = 0; row < this.GRID_SIZE; row++) {
+                for (let col = 0; col < this.GRID_SIZE; col++) {
+                    if (this.gridState[row][col] === 1) {
+                        this.ctx.fillStyle = 'blue';
+                        this.ctx.fillRect(
+                            col * this.CELL_SIZE,
+                            row * this.CELL_SIZE,
+                            this.CELL_SIZE,
+                            this.CELL_SIZE
+                        );
+                    }
+                }
+            }
+
+            // Draw gridlines
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = '#cccccc';
+            
+            // Vertical lines
+            for (let x = 0; x <= canvas.width; x += this.CELL_SIZE) {
+                this.ctx.moveTo(x, 0);
+                this.ctx.lineTo(x, canvas.width);
+            }
+            
+            // Horizontal lines
+            for (let y = 0; y <= canvas.height; y += this.CELL_SIZE) {
+                this.ctx.moveTo(0, y);
+                this.ctx.lineTo(canvas.height, y);
+            }
+            this.ctx.stroke();
+        },
+
+        handleClick(event) {
+            const rect = this.$refs.canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const col = Math.floor(x / this.CELL_SIZE);
+            const row = Math.floor(y / this.CELL_SIZE);
+            
+            if (row >= 0 && row < this.GRID_SIZE && col >= 0 && col < this.GRID_SIZE) {
+                this.gridState[row][col] = this.gridState[row][col] === 0 ? 1 : 0;
+                this.selectedCell = `Row: ${row}, Col: ${col}`;
+                this.drawGrid();
+            }
+        }
+    }))
+	})
+	</script>
+
 }
